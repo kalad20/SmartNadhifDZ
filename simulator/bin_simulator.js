@@ -1,7 +1,8 @@
 const { io } = require('socket.io-client');
 
-// Connect to the local server
-const socket = io('http://localhost:3000');
+// Connect to the server
+const PORT = process.env.PORT || 3000;
+const socket = io(`http://localhost:${PORT}`);
 
 // Create 3 simulated bins in Algiers
 const bins = [
