@@ -499,60 +499,123 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // ----------------------------------------------------
-// Truck Simulation Logic
+// Truck Simulation Logic (Self-contained)
 // ----------------------------------------------------
 function triggerTruckAnimation(binId, binLocation) {
-    const container = document.getElementById('truck-simulation-container');
+    // Inject CSS if it doesn't exist
+    if (!document.getElementById('dynamic-truck-css')) {
+        const style = document.createElement('style');
+        style.id = 'dynamic-truck-css';
+        style.innerHTML = `
+        #truck-simulation-container {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 200px;
+            background: linear-gradient(to top, #1e293b, rgba(30,41,59,0.9));
+            border-top: 4px solid #10b981; z-index: 99999;
+            transform: translateY(100%); transition: transform 0.5s ease-out;
+            display: flex; align-items: flex-end; overflow: hidden;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+        }
+        #truck-simulation-container.truck-simulation-active { transform: translateY(0); }
+        .truck-road { position: absolute; bottom: 0; width: 100%; height: 50px; background: #334155; border-top: 2px solid #475569; }
+        .road-lines {
+            position: absolute; top: 50%; width: 200%; height: 4px;
+            background: repeating-linear-gradient(90deg, transparent, transparent 20px, #cbd5e1 20px, #cbd5e1 60px);
+            transform: translateY(-50%); animation: moveRoad 1s linear infinite;
+        }
+        @keyframes moveRoad { from { transform: translateY(-50%) translateX(0); } to { transform: translateY(-50%) translateX(80px); } }
+        .truck-vehicle {
+            position: absolute; bottom: 40px; right: -300px; z-index: 2002;
+            transition: right 3s ease-out, transform 0.5s;
+        }
+        .truck-flasher {
+            position: absolute; top: 10px; left: 20px; width: 15px; height: 15px;
+            background-color: #f59e0b; border-radius: 50%; box-shadow: 0 0 20px #f59e0b;
+            animation: flashLight 0.3s infinite alternate;
+        }
+        @keyframes flashLight { from { opacity: 0.2; } to { opacity: 1; box-shadow: 0 0 30px 15px #f59e0b; } }
+        .truck-target-bin {
+            position: absolute; bottom: 50px; left: -150px; z-index: 2001; text-align: center;
+            transition: left 3s ease-out, opacity 0.5s;
+        }
+        .truck-overlay-text { position: absolute; top: 20px; left: 20px; color: white; z-index: 2003; text-shadow: 1px 1px 3px black; }
+        .truck-overlay-text h3 { color: #10b981; margin-bottom: 5px; font-size: 1.5rem; }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Inject HTML if it doesn't exist
+    let container = document.getElementById('truck-simulation-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'truck-simulation-container';
+        container.innerHTML = `
+            <div class="truck-road"><div class="road-lines" id="road-lines"></div></div>
+            <div id="truck-vehicle" class="truck-vehicle">
+                <img src="https://cdn-icons-png.flaticon.com/512/3063/3063822.png" alt="شاحنة النظافة" style="width: 200px; transform: scaleX(-1); filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));">
+                <div class="truck-flasher"></div>
+            </div>
+            <div id="truck-target-bin" class="truck-target-bin">
+                <i class="fa-solid fa-trash-can" style="font-size: 4rem; color: #10b981;"></i>
+                <div id="truck-bin-name" style="color: white; font-size: 1rem; background: #10b981; padding: 4px 10px; border-radius: 8px; margin-top: 5px; font-weight: bold;">حاوية</div>
+            </div>
+            <div class="truck-overlay-text">
+                <h3><i class="fa-solid fa-truck-fast"></i> شاحنة النظافة - بلدية عنابة</h3>
+                <p id="truck-status-text">جاري التوجه لتفريغ الحاوية...</p>
+            </div>
+        `;
+        document.body.appendChild(container);
+    }
+
     const truck = document.getElementById('truck-vehicle');
     const bin = document.getElementById('truck-target-bin');
-    const road = document.querySelector('.road-lines');
+    const road = document.getElementById('road-lines');
     const binName = document.getElementById('truck-bin-name');
-    const flasher = document.querySelector('.truck-flasher');
-    
-    if (!container || !truck || !bin || !binName) {
-        console.warn('Truck simulation elements not found in HTML. Please ensure index.html is updated.');
-        return;
-    }
+    const statusText = document.getElementById('truck-status-text');
+
+    // Reset positions
+    truck.style.right = '-300px';
+    truck.style.transform = 'none';
+    bin.style.left = '-150px';
+    bin.style.opacity = '1';
+    road.style.animationPlayState = 'running';
     
     binName.textContent = binLocation;
-    
-    // Reset animation classes
-    truck.className = 'truck-vehicle';
-    bin.className = 'truck-target-bin';
-    bin.style.opacity = '1';
-    if(flasher) flasher.className = 'truck-flasher';
-    if(road) road.classList.add('road-moving');
-    
-    // Remove inline styles from previous runs
-    truck.style.right = '';
-    truck.style.transform = '';
-    
-    // Show container
-    container.classList.add('truck-simulation-active');
-    
-    // 1. Truck drives in
+    statusText.textContent = 'جاري التوجه لتفريغ الحاوية...';
+
+    // Show container (Pop up from bottom)
     setTimeout(() => {
-        truck.classList.add('truck-driving-in');
-        bin.classList.add('bin-appear');
-        if(flasher) flasher.classList.add('flasher-active');
+        container.classList.add('truck-simulation-active');
+    }, 100);
+
+    // 1. Truck & Bin slide in
+    setTimeout(() => {
+        truck.style.right = '50%';
+        truck.style.transform = 'translateX(50%)';
+        bin.style.left = 'calc(50% + 150px)';
     }, 500);
 
     // 2. Stop and empty
     setTimeout(() => {
-        if(road) road.classList.remove('road-moving');
-        truck.classList.remove('truck-driving-in');
-        truck.style.right = '50%';
-        truck.style.transform = 'translateX(50%)';
-        truck.classList.add('truck-emptying');
+        road.style.animationPlayState = 'paused'; // Stop road
+        statusText.textContent = 'يتم الآن تفريغ الحاوية...';
+        // Shake truck slightly
+        let shakes = 0;
+        const shakeInterval = setInterval(() => {
+            truck.style.transform = shakes % 2 === 0 ? 'translateX(50%) translateY(-5px) rotate(-2deg)' : 'translateX(50%) translateY(0) rotate(0deg)';
+            shakes++;
+            if(shakes > 5) {
+                clearInterval(shakeInterval);
+                truck.style.transform = 'translateX(50%)';
+            }
+        }, 300);
     }, 3500);
 
     // 3. Drive away
     setTimeout(() => {
-        truck.classList.remove('truck-emptying');
-        if(road) road.classList.add('road-moving');
-        truck.classList.add('truck-driving-out');
-        if(flasher) flasher.classList.remove('flasher-active');
-        bin.style.opacity = '0'; // hide bin as it drives away
+        road.style.animationPlayState = 'running';
+        statusText.textContent = 'تم التفريغ بنجاح! مغادرة الموقع...';
+        truck.style.right = '120%'; // Drive off left
+        bin.style.opacity = '0'; // Hide bin
     }, 5500);
 
     // 4. Hide container
