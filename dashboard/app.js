@@ -75,10 +75,22 @@ socket.on('new_bin_added', (newBin) => {
     });
 });
 
+const previousFills = {};
+
 // Listen for real-time updates from any bin
 socket.on('dashboard_update', (binData) => {
     console.log('Update received:', binData);
     if(loadingMsg) loadingMsg.style.display = 'none';
+
+    const prevFill = previousFills[binData.binId] || 0;
+    if (prevFill > 85 && binData.fillLevel < 20) {
+        try {
+            triggerTruckAnimation(binData.binId, binData.location);
+        } catch (e) {
+            console.error('Truck animation error:', e);
+        }
+    }
+    previousFills[binData.binId] = binData.fillLevel;
 
     updateOrCreateBinCard(binData);
     
@@ -476,4 +488,67 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 8000); // Change every 8 seconds
     }
 });
+
+// ----------------------------------------------------
+// Truck Simulation Logic
+// ----------------------------------------------------
+function triggerTruckAnimation(binId, binLocation) {
+    const container = document.getElementById('truck-simulation-container');
+    const truck = document.getElementById('truck-vehicle');
+    const bin = document.getElementById('truck-target-bin');
+    const road = document.querySelector('.road-lines');
+    const binName = document.getElementById('truck-bin-name');
+    const flasher = document.querySelector('.truck-flasher');
+    
+    if (!container || !truck || !bin || !binName) {
+        console.warn('Truck simulation elements not found in HTML. Please ensure index.html is updated.');
+        return;
+    }
+    
+    binName.textContent = binLocation;
+    
+    // Reset animation classes
+    truck.className = 'truck-vehicle';
+    bin.className = 'truck-target-bin';
+    if(flasher) flasher.className = 'truck-flasher';
+    if(road) road.classList.add('road-moving');
+    
+    // Remove inline styles from previous runs
+    truck.style.right = '';
+    truck.style.transform = '';
+    
+    // Show container
+    container.classList.add('truck-simulation-active');
+    
+    // 1. Truck drives in
+    setTimeout(() => {
+        truck.classList.add('truck-driving-in');
+        bin.classList.add('bin-appear');
+        if(flasher) flasher.classList.add('flasher-active');
+    }, 500);
+
+    // 2. Stop and empty
+    setTimeout(() => {
+        if(road) road.classList.remove('road-moving');
+        truck.classList.remove('truck-driving-in');
+        truck.style.right = '50%';
+        truck.style.transform = 'translateX(50%)';
+        truck.classList.add('truck-emptying');
+    }, 3500);
+
+    // 3. Drive away
+    setTimeout(() => {
+        truck.classList.remove('truck-emptying');
+        if(road) road.classList.add('road-moving');
+        truck.classList.add('truck-driving-out');
+        if(flasher) flasher.classList.remove('flasher-active');
+        bin.style.opacity = '0'; // hide bin as it drives away
+    }, 5500);
+
+    // 4. Hide container
+    setTimeout(() => {
+        container.classList.remove('truck-simulation-active');
+    }, 8500);
+}
+
 
