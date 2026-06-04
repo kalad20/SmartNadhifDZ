@@ -543,28 +543,30 @@ function triggerTruckAnimation(binId, binLocation) {
         document.head.appendChild(style);
     }
 
-    // Inject HTML if it doesn't exist
-    let container = document.getElementById('truck-simulation-container');
-    if (!container) {
-        container = document.createElement('div');
-        container.id = 'truck-simulation-container';
-        container.innerHTML = `
-            <div class="truck-road"><div class="road-lines" id="road-lines"></div></div>
-            <div id="truck-vehicle" class="truck-vehicle">
-                <img src="realistic_garbage_truck_1780601867606.png" alt="شاحنة النظافة مع عامل" style="height: 140px; transform: scaleX(-1); filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); border-radius: 10px;">
-                <div class="truck-flasher"></div>
-            </div>
-            <div id="truck-target-bin" class="truck-target-bin">
-                <i class="fa-solid fa-trash-can" style="font-size: 3rem; color: #10b981; filter: drop-shadow(0 0 10px #10b981);"></i>
-                <div id="truck-bin-name" style="color: white; font-size: 0.9rem; background: #10b981; padding: 2px 8px; border-radius: 8px; margin-top: 5px; font-weight: bold; border: 1px solid white;">حاوية</div>
-            </div>
-            <div class="truck-overlay-text">
-                <h3><i class="fa-solid fa-truck-fast"></i> شاحنة النظافة - بلدية عنابة</h3>
-                <p id="truck-status-text">جاري التوجه لتفريغ الحاوية...</p>
-            </div>
-        `;
-        document.body.appendChild(container);
+    // Inject HTML by forcefully removing old one to avoid structure mismatch
+    let oldContainer = document.getElementById('truck-simulation-container');
+    if (oldContainer) {
+        oldContainer.remove();
     }
+
+    let container = document.createElement('div');
+    container.id = 'truck-simulation-container';
+    container.innerHTML = `
+        <div class="truck-road"><div class="road-lines" id="road-lines"></div></div>
+        <div id="truck-vehicle" class="truck-vehicle">
+            <img src="realistic_garbage_truck_1780601867606.png" alt="شاحنة النظافة مع عامل" style="height: 140px; transform: scaleX(-1); filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); border-radius: 10px;">
+            <div class="truck-flasher"></div>
+        </div>
+        <div id="truck-target-bin" class="truck-target-bin">
+            <i class="fa-solid fa-trash-can" style="font-size: 3rem; color: #10b981; filter: drop-shadow(0 0 10px #10b981);"></i>
+            <div id="truck-bin-name" style="color: white; font-size: 0.9rem; background: #10b981; padding: 2px 8px; border-radius: 8px; margin-top: 5px; font-weight: bold; border: 1px solid white;">حاوية</div>
+        </div>
+        <div class="truck-overlay-text">
+            <h3><i class="fa-solid fa-truck-fast"></i> شاحنة النظافة - بلدية عنابة</h3>
+            <p id="truck-status-text">جاري التوجه لتفريغ الحاوية...</p>
+        </div>
+    `;
+    document.body.appendChild(container);
 
     const truck = document.getElementById('truck-vehicle');
     const bin = document.getElementById('truck-target-bin');
