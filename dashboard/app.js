@@ -362,8 +362,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let markers = {};
     
     if (mapElement && typeof L !== 'undefined') {
-        // Algiers coordinates
-        map = L.map('algiers-map').setView([36.7538, 3.0588], 12);
+        // Annaba coordinates
+        map = L.map('algiers-map').setView([36.9000, 7.7667], 12);
         
         // Add dark-themed tiles (CartoDB Dark Matter)
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -374,9 +374,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Add dummy markers for bins
         const binLocations = [
-            { id: 'BIN_ALG_001', lat: 36.7538, lng: 3.0588, name: 'الجزائر الوسطى' },
-            { id: 'BIN_ALG_002', lat: 36.7118, lng: 3.1819, name: 'باب الزوار' },
-            { id: 'BIN_ALG_003', lat: 36.7642, lng: 3.0231, name: 'بن عكنون' }
+            { id: 'BIN_ALG_001', lat: 36.9000, lng: 7.7667, name: 'عنابة - وسط المدينة' },
+            { id: 'BIN_ALG_002', lat: 36.8333, lng: 7.7333, name: 'سيدي عمار' },
+            { id: 'BIN_ALG_003', lat: 36.8667, lng: 7.7500, name: 'البوني' }
         ];
 
         // Custom icon for smart bin
@@ -459,9 +459,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (aiText) {
         aiText.style.transition = 'opacity 0.5s ease';
         const predictions = [
-            "تنبؤ استباقي: الحاوية في (باب الزوار) ستمتلئ خلال 3 ساعات بناءً على الكثافة الطلابية الحالية. 🚀",
+            "تنبؤ استباقي: الحاوية في (سيدي عمار) ستمتلئ خلال 3 ساعات بناءً على الكثافة الطلابية الحالية. 🚀",
             "تحليل البيانات: ارتفاع بنسبة 25% في جمع البلاستيك اليوم مقارنة بيوم الخميس الماضي. 📈",
-            "توجيه خوارزمي: ينصح بتوجيه شاحنة الجمع إلى مسار (بن عكنون -> الجزائر الوسطى) الليلة لتوفير الوقود. 🗺️",
+            "توجيه خوارزمي: ينصح بتوجيه شاحنة الجمع إلى مسار (البوني -> عنابة وسط) الليلة لتوفير الوقود. 🗺️",
             "نظام الطقس: الطقس سيكون ممطراً غداً، نتوقع انخفاضاً بنسبة 10% في عمليات الرمي. 🌧️"
         ];
         
