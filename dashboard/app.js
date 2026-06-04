@@ -50,6 +50,10 @@ newBinForm.addEventListener('submit', (e) => {
 const testTruckBtn = document.getElementById('test-truck-btn');
 if (testTruckBtn) {
     testTruckBtn.addEventListener('click', () => {
+        Swal.fire({
+            toast: true, position: 'top-end', showConfirmButton: false, timer: 3000,
+            icon: 'info', title: 'بدء المحاكاة', text: 'تم إرسال أمر الشاحنة بنجاح'
+        });
         triggerTruckAnimation('BIN_TEST', 'تفريغ تجريبي (عنابة)');
     });
 }
@@ -508,12 +512,12 @@ function triggerTruckAnimation(binId, binLocation) {
         style.id = 'dynamic-truck-css';
         style.innerHTML = `
         #truck-simulation-container {
-            position: fixed; bottom: 0; left: 0; width: 100%; height: 200px;
-            background: linear-gradient(to top, #1e293b, rgba(30,41,59,0.9));
-            border-top: 4px solid #10b981; z-index: 99999;
-            transform: translateY(100%); transition: transform 0.5s ease-out;
+            position: fixed; bottom: 20px; left: 5%; width: 90%; height: 200px;
+            background: linear-gradient(to top, #0f172a, #1e293b);
+            border: 4px solid #10b981; border-radius: 20px; z-index: 2147483647;
+            transform: translateY(200%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex; align-items: flex-end; overflow: hidden;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
         }
         #truck-simulation-container.truck-simulation-active { transform: translateY(0); }
         .truck-road { position: absolute; bottom: 0; width: 100%; height: 50px; background: #334155; border-top: 2px solid #475569; }
@@ -543,11 +547,9 @@ function triggerTruckAnimation(binId, binLocation) {
         document.head.appendChild(style);
     }
 
-    // Inject HTML by forcefully removing old one to avoid structure mismatch
-    let oldContainer = document.getElementById('truck-simulation-container');
-    if (oldContainer) {
-        oldContainer.remove();
-    }
+    // Inject HTML by forcefully removing ALL old ones to avoid duplicates
+    let oldContainers = document.querySelectorAll('#truck-simulation-container');
+    oldContainers.forEach(c => c.remove());
 
     let container = document.createElement('div');
     container.id = 'truck-simulation-container';
