@@ -46,6 +46,14 @@ newBinForm.addEventListener('submit', (e) => {
     }
 });
 
+// Test Truck Button
+const testTruckBtn = document.getElementById('test-truck-btn');
+if (testTruckBtn) {
+    testTruckBtn.addEventListener('click', () => {
+        triggerTruckAnimation('BIN_TEST', 'تفريغ تجريبي (عنابة)');
+    });
+}
+
 // State to store rendered bins
 const renderedBins = new Set();
 
@@ -83,7 +91,8 @@ socket.on('dashboard_update', (binData) => {
     if(loadingMsg) loadingMsg.style.display = 'none';
 
     const prevFill = previousFills[binData.binId] || 0;
-    if (prevFill > 85 && binData.fillLevel < 20) {
+    // If the bin level drops by more than 40%, it means it was emptied!
+    if (prevFill > (binData.fillLevel + 40)) {
         try {
             triggerTruckAnimation(binData.binId, binData.location);
         } catch (e) {
@@ -510,6 +519,7 @@ function triggerTruckAnimation(binId, binLocation) {
     // Reset animation classes
     truck.className = 'truck-vehicle';
     bin.className = 'truck-target-bin';
+    bin.style.opacity = '1';
     if(flasher) flasher.className = 'truck-flasher';
     if(road) road.classList.add('road-moving');
     
