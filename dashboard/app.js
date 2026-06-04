@@ -252,26 +252,52 @@ function showToast(message) {
 // ----------------------------------------------------
 const binContainer = document.getElementById('bin-image-container');
 if (binContainer) {
-    let showingInternal = false;
-    binContainer.addEventListener('click', () => {
-        showingInternal = !showingInternal;
-        const extImg = document.getElementById('bin-ext');
-        const intImg = document.getElementById('bin-int');
-        if(extImg && intImg) {
-            extImg.style.opacity = showingInternal ? '0' : '1';
-            intImg.style.opacity = showingInternal ? '1' : '0';
+    const intImg = document.getElementById('bin-int');
+    const xrayHint = document.getElementById('xray-hint');
+
+    // 3D Tilt and X-Ray Effect on Mouse Move
+    binContainer.addEventListener('mousemove', (e) => {
+        const rect = binContainer.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // 1. X-Ray logic (Magnifying Glass)
+        if (intImg) {
+            // Remove transition for smooth tracking
+            intImg.style.transition = 'none';
+            // Show a circle of 150px radius at the mouse position
+            intImg.style.clipPath = `circle(150px at ${x}px ${y}px)`;
         }
         
-        const hint = binContainer.querySelector('.click-hint');
-        if(hint) {
-            if(showingInternal) {
-                hint.innerHTML = '<i class="fa-solid fa-cube"></i> اضغط للعودة للشكل الخارجي';
-                hint.style.background = 'rgba(239, 68, 68, 0.9)'; // Redish when open
-            } else {
-                hint.innerHTML = '<i class="fa-solid fa-hand-pointer"></i> اضغط لرؤية المكونات الداخلية';
-                hint.style.background = 'rgba(16, 185, 129, 0.9)'; // Greenish when closed
-            }
+        // Hide hint when interacting
+        if (xrayHint) xrayHint.style.opacity = '0';
+
+        // 2. 3D Tilt Logic
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = ((y - centerY) / centerY) * -15;
+        const rotateY = ((x - centerX) / centerX) * 15;
+        
+        binContainer.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+        binContainer.style.zIndex = '10';
+        
+        const shadowX = -rotateY;
+        const shadowY = rotateX;
+        binContainer.style.boxShadow = `${shadowX}px ${shadowY}px 30px rgba(16, 185, 129, 0.4)`;
+    });
+
+    // Reset transform and X-Ray when mouse leaves
+    binContainer.addEventListener('mouseleave', () => {
+        if (intImg) {
+            intImg.style.transition = 'clip-path 0.5s ease-out';
+            intImg.style.clipPath = 'circle(0% at 50% 50%)'; // Hide inside view
         }
+        
+        if (xrayHint) xrayHint.style.opacity = '1';
+
+        binContainer.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+        binContainer.style.boxShadow = 'none';
+        binContainer.style.zIndex = '1';
     });
 }
 
@@ -325,4 +351,129 @@ if (simulateBtn) {
         }
     });
 }
+
+// ----------------------------------------------------
+// Smart City Advanced Analytics (Map, Chart, AI)
+// ----------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Initialize Interactive Map (Leaflet)
+    const mapElement = document.getElementById('algiers-map');
+    let map;
+    let markers = {};
+    
+    if (mapElement && typeof L !== 'undefined') {
+        // Algiers coordinates
+        map = L.map('algiers-map').setView([36.7538, 3.0588], 12);
+        
+        // Add dark-themed tiles (CartoDB Dark Matter)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // Add dummy markers for bins
+        const binLocations = [
+            { id: 'BIN_ALG_001', lat: 36.7538, lng: 3.0588, name: 'الجزائر الوسطى' },
+            { id: 'BIN_ALG_002', lat: 36.7118, lng: 3.1819, name: 'باب الزوار' },
+            { id: 'BIN_ALG_003', lat: 36.7642, lng: 3.0231, name: 'بن عكنون' }
+        ];
+
+        // Custom icon for smart bin
+        const binIcon = L.divIcon({
+            className: 'custom-map-marker',
+            html: '<div style="background-color: var(--primary); width: 15px; height: 15px; border-radius: 50%; box-shadow: 0 0 10px var(--primary); border: 2px solid white; transition: background-color 0.3s;"></div>',
+            iconSize: [15, 15]
+        });
+
+        binLocations.forEach(loc => {
+            const marker = L.marker([loc.lat, loc.lng], {icon: binIcon}).addTo(map);
+            marker.bindPopup(`<b>${loc.name}</b><br>حاوية ذكية رقم: ${loc.id}`);
+            markers[loc.id] = marker;
+        });
+
+        // Expose markers globally to update them when bin fills up
+        window.updateMapMarker = (binId, percent) => {
+            if (markers[binId]) {
+                const color = percent > 85 ? 'var(--danger)' : (percent > 60 ? 'var(--warning)' : 'var(--primary)');
+                const iconHtml = `<div style="background-color: ${color}; width: 15px; height: 15px; border-radius: 50%; box-shadow: 0 0 15px ${color}; border: 2px solid white; transition: all 0.5s;"></div>`;
+                markers[binId].setIcon(L.divIcon({ className: 'custom-map-marker', html: iconHtml, iconSize: [15, 15] }));
+            }
+        };
+    }
+
+    // 2. Initialize Analytics Chart (Chart.js)
+    const chartElement = document.getElementById('plasticChart');
+    if (chartElement && typeof Chart !== 'undefined') {
+        const ctx = chartElement.getContext('2d');
+        
+        // Gradient for chart
+        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.6)'); // Green
+        gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+                datasets: [{
+                    label: 'كمية البلاستيك المجمعة (قارورة)',
+                    data: [120, 190, 150, 220, 180, 250, 310],
+                    borderColor: '#10b981',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    tension: 0.4, // Smooth curve
+                    fill: true,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#10b981',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#94a3b8', font: { family: 'Cairo' } }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8', font: { family: 'Cairo' } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8', font: { family: 'Cairo' } },
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // 3. Fake AI Prediction Logic
+    const aiText = document.getElementById('ai-prediction-text');
+    if (aiText) {
+        aiText.style.transition = 'opacity 0.5s ease';
+        const predictions = [
+            "تنبؤ استباقي: الحاوية في (باب الزوار) ستمتلئ خلال 3 ساعات بناءً على الكثافة الطلابية الحالية. 🚀",
+            "تحليل البيانات: ارتفاع بنسبة 25% في جمع البلاستيك اليوم مقارنة بيوم الخميس الماضي. 📈",
+            "توجيه خوارزمي: ينصح بتوجيه شاحنة الجمع إلى مسار (بن عكنون -> الجزائر الوسطى) الليلة لتوفير الوقود. 🗺️",
+            "نظام الطقس: الطقس سيكون ممطراً غداً، نتوقع انخفاضاً بنسبة 10% في عمليات الرمي. 🌧️"
+        ];
+        
+        let predIndex = 0;
+        setInterval(() => {
+            aiText.style.opacity = 0;
+            setTimeout(() => {
+                aiText.innerHTML = `<strong style="color: #ecfdf5;">${predictions[predIndex]}</strong> <span style="color: #10b981; font-size: 0.8rem; margin-right: 10px;"><i class="fa-solid fa-check-circle"></i> تم التحليل (AI)</span>`;
+                aiText.style.opacity = 1;
+                predIndex = (predIndex + 1) % predictions.length;
+            }, 500); // match transition duration
+        }, 8000); // Change every 8 seconds
+    }
+});
 

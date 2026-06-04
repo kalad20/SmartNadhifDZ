@@ -496,3 +496,124 @@ header {
     font-size: 1.5rem;
     color: var(--primary);
 }
+
+/* Custom CSS Animation for the Sorting Mechanism */
+.animation-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background: #0f172a;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--glass-border);
+}
+
+.anim-rfid-card {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2rem;
+    color: var(--text-muted);
+    animation: scanRFID 5s infinite ease-in-out;
+}
+
+.anim-bottle {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2.5rem;
+    color: #cbd5e1;
+    animation: dropBottle 5s infinite ease-in;
+    z-index: 5;
+}
+
+.anim-platform {
+    position: absolute;
+    top: 130px;
+    left: 25%;
+    width: 50%;
+    height: 8px;
+    background: #475569;
+    border-radius: 4px;
+    transform-origin: center;
+    animation: tiltPlatform 5s infinite ease-in-out;
+    z-index: 4;
+}
+
+.anim-sensor-beam {
+    position: absolute;
+    top: 100px;
+    left: 10%;
+    width: 80%;
+    height: 2px;
+    background: transparent;
+    box-shadow: 0 0 10px transparent;
+    animation: scanBeam 5s infinite ease-in-out;
+}
+
+.anim-bin-left, .anim-bin-right {
+    position: absolute;
+    bottom: 20px;
+    width: 90px;
+    height: 90px;
+    border-radius: 8px 8px 4px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+}
+.anim-bin-left {
+    left: 15%;
+    background: #334155;
+    border: 2px solid #475569;
+}
+.anim-bin-right {
+    right: 15%;
+    background: rgba(16, 185, 129, 0.15);
+    border: 2px solid var(--primary);
+}
+.anim-reward {
+    position: absolute;
+    bottom: 120px;
+    right: 20%;
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 1.2rem;
+    opacity: 0;
+    animation: showReward 5s infinite ease-out;
+}
+
+@keyframes scanRFID {
+    0%, 5% { color: var(--text-muted); transform: scale(1); }
+    10%, 20% { color: var(--primary); transform: scale(1.2); text-shadow: 0 0 15px var(--primary); }
+    25%, 100% { color: var(--text-muted); transform: scale(1); }
+}
+
+@keyframes dropBottle {
+    0%, 15% { top: -50px; opacity: 1; transform: translate(-50%, 0) rotate(0deg); }
+    25% { top: 90px; transform: translate(-50%, 0) rotate(10deg); }
+    45% { top: 90px; transform: translate(-50%, 0) rotate(10deg); }
+    50% { top: 120px; transform: translate(20px, 0) rotate(45deg); opacity: 1; }
+    60% { top: 220px; transform: translate(110px, 0) rotate(90deg); opacity: 1; }
+    65%, 100% { top: 250px; transform: translate(110px, 0) rotate(90deg); opacity: 0; }
+}
+
+@keyframes scanBeam {
+    0%, 25% { background: transparent; box-shadow: 0 0 10px transparent; }
+    30%, 40% { background: var(--primary); box-shadow: 0 0 15px var(--primary); }
+    45%, 100% { background: transparent; box-shadow: 0 0 10px transparent; }
+}
+
+@keyframes tiltPlatform {
+    0%, 40% { transform: rotate(0deg); }
+    45%, 60% { transform: rotate(35deg); }
+    65%, 100% { transform: rotate(0deg); }
+}
+
+@keyframes showReward {
+    0%, 60% { opacity: 0; transform: translateY(0); }
+    65%, 80% { opacity: 1; transform: translateY(-20px); }
+    85%, 100% { opacity: 0; transform: translateY(-30px); }
+}

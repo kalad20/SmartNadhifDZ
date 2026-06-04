@@ -4,14 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الحاوية الذكية - بلدية الجزائر</title>
-    <!-- Arabic modern font -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Arabic modern and calligraphy fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 </head>
 <body>
-    <div class="dashboard-container">
+    <!-- Bismillah Banner -->
+    <div style="text-align: center; padding: 12px; background: linear-gradient(90deg, #022c22 0%, #064e3b 50%, #022c22 100%); color: #ecfdf5; font-size: 1.4rem; border-bottom: 2px solid var(--primary); font-family: 'Amiri', serif; margin-bottom: 0px; box-shadow: 0 4px 20px rgba(0,0,0,0.4); text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+        <i class="fa-solid fa-star-and-crescent" style="color: var(--primary); margin-left: 12px; font-size: 1rem;"></i>
+        بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ، وَلا حَوْلَ وَلا قُوَّةَ إِلاَّ بِاللَّهِ
+        <i class="fa-solid fa-star-and-crescent" style="color: var(--primary); margin-right: 12px; font-size: 1rem;"></i>
+    </div>
+
+    <div class="dashboard-container" style="margin-top: 20px;">
         <header>
             <div class="logo-container">
                 <img src="media/logo.png?v=3" alt="SMART NADHIF DZ Logo" class="project-logo" id="main-logo" onerror="this.src='https://ui-avatars.com/api/?name=SN&background=10b981&color=fff&size=150'">
@@ -37,11 +46,11 @@
                 <p>صورة واقعية للنموذج الأولي وشرح لمكوناته الإلكترونية</p>
             </div>
             <div class="hardware-layout">
-                <div class="prototype-image-container" id="bin-image-container" style="cursor: pointer; position: relative;">
-                    <img src="prototype.png" alt="نموذج الحاوية الذكية" class="prototype-img external-view" id="bin-ext" style="transition: opacity 0.5s;">
-                    <img src="internal.png" alt="مكونات الحاوية من الداخل" class="prototype-img internal-view" id="bin-int" style="opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s;">
-                    <div class="click-hint" style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); background: rgba(16, 185, 129, 0.9); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.95rem; font-weight: bold; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: none; transition: background 0.3s; z-index: 10;">
-                        <i class="fa-solid fa-hand-pointer"></i> اضغط لرؤية المكونات الداخلية
+                <div class="prototype-image-container" id="bin-image-container" style="cursor: crosshair; position: relative; border-radius: 16px; overflow: hidden;">
+                    <img src="prototype.png" alt="نموذج الحاوية الذكية" class="prototype-img external-view" id="bin-ext" style="display: block; width: 100%;">
+                    <img src="internal.png" alt="مكونات الحاوية من الداخل" class="prototype-img internal-view" id="bin-int" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; clip-path: circle(0% at 50% 50%); transition: clip-path 0.3s ease-out;">
+                    <div class="click-hint" id="xray-hint" style="position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); background: rgba(16, 185, 129, 0.9); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.95rem; font-weight: bold; white-space: nowrap; box-shadow: 0 4px 15px rgba(0,0,0,0.5); pointer-events: none; transition: opacity 0.3s; z-index: 20;">
+                        <i class="fa-solid fa-search"></i> حرك الماوس لرؤية ما بداخل الحاوية
                     </div>
                 </div>
                 <div class="hardware-grid">
@@ -88,16 +97,35 @@
         <!-- Workflow Section -->
         <section class="workflow-section hardware-section">
             <div class="section-title">
-                <h2>مخطط سير العمل المباشر</h2>
-                <p>كيف تتواصل الحاوية مع البلدية لإرسال شاحنة التفريغ</p>
+                <h2>مخططات سير العمل (النظام الذكي)</h2>
+                <p>كيف تعمل الحاوية من الداخل وكيف تتواصل مع البلدية</p>
             </div>
-            <div class="mermaid-container" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 2rem; overflow: auto;">
-                <div class="mermaid">
-                    graph LR
-                        A((الحاوية ممتلئة 100%)) -->|إرسال إشعار فوري عبر الإنترنت| B{لوحة تحكم البلدية}
-                        B -->|تحديد الموقع وأقصر مسار| C[شاحنة جمع النفايات]
-                        C -->|وصول الشاحنة والتفريغ| D((تعود الحاوية 0%))
-                        D -.->|جاهزة| A
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem;">
+                <!-- Internal Sorting Workflow -->
+                <div class="mermaid-container" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1.5rem; overflow: auto; text-align: center;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem; font-size: 1.2rem;">محاكاة حية لفرز البلاستيك داخل الحاوية</h3>
+                    <div class="animation-container">
+                        <i class="fa-solid fa-id-card anim-rfid-card"></i>
+                        <i class="fa-solid fa-bottle-water anim-bottle"></i>
+                        <div class="anim-sensor-beam"></div>
+                        <div class="anim-platform"></div>
+                        <div class="anim-bin-left">عامة</div>
+                        <div class="anim-bin-right">بلاستيك</div>
+                        <div class="anim-reward">+15 د.ج</div>
+                    </div>
+                </div>
+
+                <!-- External City Workflow -->
+                <div class="mermaid-container" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 1.5rem; overflow: auto; text-align: center;">
+                    <h3 style="color: var(--primary); margin-bottom: 1rem; font-size: 1.2rem;">تواصل الحاوية مع شاحنات البلدية</h3>
+                    <div class="mermaid">
+                        graph TD
+                            A((الحاوية ممتلئة 100%)) -->|إرسال إشعار فوري عبر الإنترنت| B{لوحة تحكم البلدية}
+                            B -->|تحديد الموقع وأقصر مسار| C[شاحنة جمع النفايات]
+                            C -->|وصول الشاحنة والتفريغ| D((تعود الحاوية 0%))
+                            D -.->|جاهزة| A
+                    </div>
                 </div>
             </div>
         </section>
@@ -114,6 +142,45 @@
                 </div>
             </div>
             
+            <!-- Smart City Analytics & Map Section -->
+            <div class="advanced-tech-section" style="margin-bottom: 3rem;">
+                
+                <!-- AI Prediction Card -->
+                <div class="ai-prediction-card" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1.5rem;">
+                    <div class="ai-icon-container" style="background: rgba(59, 130, 246, 0.2); padding: 15px; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="fa-solid fa-brain" style="color: #3b82f6; font-size: 2rem; animation: pulse 2s infinite;"></i>
+                    </div>
+                    <div>
+                        <h3 style="color: #60a5fa; margin-bottom: 0.5rem; font-size: 1.2rem;"><i class="fa-solid fa-sparkles"></i> ذكاء اصطناعي تحليلي (SmartNadhif AI)</h3>
+                        <p id="ai-prediction-text" style="color: var(--text-main); font-size: 1rem; line-height: 1.5;">جارٍ جمع البيانات الجغرافية لتحليل سلوك رمي النفايات... <span style="opacity: 0.7;">(توقعات تفريغ الحاويات ستظهر قريباً بناءً على كثافة الاستخدام)</span></p>
+                    </div>
+                </div>
+
+                <!-- Map and Chart Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 2rem;">
+                    
+                    <!-- Analytics Chart -->
+                    <div class="chart-container" style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem; display: flex; justify-content: space-between;">
+                            <span><i class="fa-solid fa-chart-line text-green"></i> الإحصائيات الأسبوعية (Big Data)</span>
+                            <span style="font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 3px 8px; border-radius: 12px;">أسبوعي</span>
+                        </h3>
+                        <div style="height: 300px; position: relative;">
+                            <canvas id="plasticChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Map -->
+                    <div class="map-wrapper" style="background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem;">
+                        <h3 style="margin-bottom: 1rem;">
+                            <i class="fa-solid fa-map-location-dot text-green"></i> خريطة العاصمة التفاعلية (GIS)
+                        </h3>
+                        <div id="algiers-map" style="height: 300px; width: 100%; border-radius: 12px; z-index: 1;"></div>
+                    </div>
+
+                </div>
+            </div>
+
             <!-- Add Bin Form -->
             <div id="add-bin-form" class="add-bin-form-container" style="display: none;">
                 <h3><i class="fa-solid fa-map-location-dot"></i> إضافة حاوية ذكية جديدة إلى الشبكة</h3>
@@ -153,5 +220,14 @@
     <!-- Include Mermaid JS for Flowchart -->
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10.4.0/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({ startOnLoad: true, theme: 'dark' });</script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 </body>
 </html>
