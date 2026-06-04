@@ -338,7 +338,7 @@ if (simulateBtn) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    binId: 'BIN_ALG_001',
+                    binId: 'BIN_ANN_001',
                     rfid: randomRFID,
                     wasteType: 'plastic'
                 })
@@ -374,9 +374,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Add dummy markers for bins
         const binLocations = [
-            { id: 'BIN_ALG_001', lat: 36.9000, lng: 7.7667, name: 'عنابة - وسط المدينة' },
-            { id: 'BIN_ALG_002', lat: 36.8333, lng: 7.7333, name: 'سيدي عمار' },
-            { id: 'BIN_ALG_003', lat: 36.8667, lng: 7.7500, name: 'البوني' }
+            { id: 'BIN_ANN_001', lat: 36.9000, lng: 7.7667, name: 'عنابة - وسط المدينة' },
+            { id: 'BIN_ANN_002', lat: 36.8333, lng: 7.7333, name: 'سيدي عمار' },
+            { id: 'BIN_ANN_003', lat: 36.8667, lng: 7.7500, name: 'البوني' }
         ];
 
         // Custom icon for smart bin

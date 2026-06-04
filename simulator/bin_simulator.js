@@ -6,9 +6,9 @@ const socket = io(`http://127.0.0.1:${PORT}`);
 
 // Create 3 simulated bins in Annaba
 const bins = [
-    { binId: 'BIN_ALG_001', location: 'عنابة - وسط المدينة', fillLevel: 10, totalPoints: 0 },
-    { binId: 'BIN_ALG_002', location: 'سيدي عمار', fillLevel: 40, totalPoints: 150 },
-    { binId: 'BIN_ALG_003', location: 'البوني', fillLevel: 85, totalPoints: 450 }
+    { binId: 'BIN_ANN_001', location: 'عنابة - وسط المدينة', fillLevel: 10, totalPoints: 0 },
+    { binId: 'BIN_ANN_002', location: 'سيدي عمار', fillLevel: 40, totalPoints: 150 },
+    { binId: 'BIN_ANN_003', location: 'البوني', fillLevel: 85, totalPoints: 450 }
 ];
 
 socket.on('connect', () => {
