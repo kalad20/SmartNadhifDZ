@@ -1,8 +1,8 @@
 const { io } = require('socket.io-client');
 
-// Connect to the server
+// Connect to the server explicitly via IPv4 loopback
 const PORT = process.env.PORT || 3000;
-const socket = io(`http://localhost:${PORT}`);
+const socket = io(`http://127.0.0.1:${PORT}`);
 
 // Create 3 simulated bins in Algiers
 const bins = [
